@@ -20,6 +20,7 @@ Nodo* QuitarNodo(Nodo** L, int id);
 Nodo* borrarPrimerElemento(Nodo* L); //esta la usare para al final borrar la memoria de todas las listas
 Nodo* buscarNodoPorID(Nodo* L, int IdBuscado);
 void TrasladoTarea(Nodo** L1, Nodo** L2,int ID);
+void mostrar(Nodo*L);
 //////////////////////////////////////////
 int main(){
     Nodo* TareasPendientes;
@@ -28,7 +29,7 @@ int main(){
     Nodo* encontrado;
     Tarea tar;
     tar.Descripcion=(char *)malloc(100 * sizeof(char));
-    int opciones, idauto=999, finaliza=0;
+    int opciones, idauto=999, finaliza=0,opciones2;
     TareasPendientes=crearLista();
     TareasRealizadas=crearLista();
 
@@ -63,13 +64,39 @@ int main(){
         scanf("%d",&finaliza);
         fflush(stdin);
     } while(finaliza!=1);
+    finaliza=0;
+
+    while(finaliza!=1){
+        printf("\n1-Mostrar ambas lista \n2-Mostrar lista de tareas pendientes \n3-Mostrar lista de tareas realizadas\n4-Finalizar\n");
+        scanf("%d",&opciones2);
+        switch (opciones2){
+        case 1:
+            printf("Lista de tareas pendientes:");
+            mostrar(TareasPendientes);
+            printf("\n\nLista de tareas realizadas:");
+            mostrar(TareasRealizadas);
+            break;
+        case 2:
+            printf("Lista de tareas pendientes:");
+            mostrar(TareasPendientes);
+            break;  
+        case 3:
+            printf("Lista de tareas realizadas:");
+            mostrar(TareasRealizadas);
+            break;      
+        
+        default:
+            finaliza=1;
+            break;
+        }
+    }
 
     while(TareasPendientes!=NULL){
         TareasPendientes=borrarPrimerElemento(TareasPendientes); //para liberar toda la memoria
     }
-    /* while(TareasRealizadas!=NULL){
+    while(TareasRealizadas!=NULL){
         TareasRealizadas=borrarPrimerElemento(TareasRealizadas);
-    } */
+    }
     free(tar.Descripcion);
     printf("\nprobando final");
 
@@ -83,7 +110,10 @@ Nodo* crearLista(){
 
 Nodo* CrearNodo(Tarea tar){
     Nodo *nuevo=(Nodo *)malloc(sizeof(Nodo));
-    nuevo->T=tar;
+    nuevo->T.TareaID=tar.TareaID;
+    nuevo->T.Duracion=tar.Duracion;
+    nuevo->T.Descripcion=(char*)malloc(strlen(tar.Descripcion)+1);
+    strcpy(nuevo->T.Descripcion,tar.Descripcion);
     nuevo->Siguiente=NULL;
     return nuevo;
 }
@@ -132,5 +162,14 @@ void TrasladoTarea(Nodo** L1, Nodo** L2,int ID){
         printf("Tarea id:%d movida\n",ID);
     } else{
         printf("Esa tarea no forma parte de la lista de tareas pendientes\n");
+    }
+}
+
+void mostrar(Nodo*L){
+    while(L!=NULL){
+        printf("\nTarea ID: %d",L->T.TareaID);
+        printf("\nDescripcion: %s",L->T.Descripcion);
+        printf("\nDuracion: %d",L->T.Duracion);
+        L=L->Siguiente;
     }
 }
