@@ -16,13 +16,16 @@ typedef struct Nodo {
 Nodo* crearLista();
 Nodo* CrearNodo(Tarea tar);
 void InsertarNodo(Nodo **L,Nodo *nuevo);
-Nodo* QuitarNodo(Nodo* L, int id);
+Nodo* QuitarNodo(Nodo** L, int id);
 Nodo* borrarPrimerElemento(Nodo* L); //esta la usare para al final borrar la memoria de todas las listas
+Nodo* buscarNodoPorID(Nodo* L, int IdBuscado);
+void TrasladoTarea(Nodo** L1, Nodo** L2,int ID);
 //////////////////////////////////////////
 int main(){
     Nodo* TareasPendientes;
     Nodo* TareasRealizadas;
     Nodo* nuevo;
+    Nodo* encontrado;
     Tarea tar;
     tar.Descripcion=(char *)malloc(100 * sizeof(char));
     int opciones, idauto=999, finaliza=0;
@@ -47,10 +50,19 @@ int main(){
         scanf("%d",&finaliza);
         fflush(stdin);
     } while(finaliza!=1);
-    
-    /*printf("ID: %d",TareasPendientes->T.TareaID);
-    printf("\nDescripcion: %s",TareasPendientes->T.Descripcion);
-    printf("\nDuracion: %d",TareasPendientes->T.Duracion); */
+    finaliza=0;
+
+    //para el checkeo de tareas, tengo que buscar el nodo, quitarlo y luego insertarlo en la otra lista
+    printf("Checkeo de tareas:\n");
+    do{
+        printf("Ingrese el id de la tarea para marcarla como completada:\n");
+        scanf("%d",&tar.TareaID);
+        fflush(stdin);
+        TrasladoTarea(&TareasPendientes, &TareasRealizadas,tar.TareaID);
+        printf("Ingrese 1 si quiere parar de marcar tareas como completadas, cualquier otro numero para continuar\n");
+        scanf("%d",&finaliza);
+        fflush(stdin);
+    } while(finaliza!=1);
 
     while(TareasPendientes!=NULL){
         TareasPendientes=borrarPrimerElemento(TareasPendientes); //para liberar toda la memoria
@@ -81,19 +93,20 @@ void InsertarNodo(Nodo **L,Nodo *nuevo){
     *L=nuevo;
 }
 
-Nodo* QuitarNodo(Nodo* L, int id){
-    Nodo **aux=&L;
-    while(*aux!=NULL && (*aux)->T.TareaID !=id){
-        aux= &(*aux)->Siguiente;
+Nodo* QuitarNodo(Nodo** L, int id){
+    Nodo **aux = L;                 
+    while (*aux != NULL && (*aux)->T.TareaID != id)
+    {                             
+        aux = &(*aux)->Siguiente; 
     }
-
-    if(*aux){
-        Nodo* temp=*aux;
-        *aux=(*aux)->Siguiente;
-        temp->Siguiente=NULL;
-        return temp;
+    if (*aux) 
+    {
+        Nodo *temp = *aux;       
+        *aux = (*aux)->Siguiente; 
+        temp->Siguiente = NULL;   
+        return temp;             //retorna el nodo que quiero transferir 
     }
-    return NULL;
+    return NULL; //si no se encuentra
 }
 
 Nodo* borrarPrimerElemento(Nodo* L){
@@ -101,4 +114,23 @@ Nodo* borrarPrimerElemento(Nodo* L){
     L= L->Siguiente;
     free (aux);
     return L;
+}
+
+Nodo* buscarNodoPorID(Nodo* L, int IdBuscado){
+    Nodo* Aux = L;
+    while((Aux!=NULL) && Aux->T.TareaID != IdBuscado){
+        Aux = Aux->Siguiente;
+    }
+    return Aux; //si no lo encuentra me da nulo
+}
+
+void TrasladoTarea(Nodo** L1, Nodo** L2,int ID){
+    Nodo* nodoTraslado;
+    nodoTraslado=QuitarNodo(L1,ID);
+    if (nodoTraslado){
+        InsertarNodo(L2,nodoTraslado);
+        printf("Tarea id:%d movida\n",ID);
+    } else{
+        printf("Esa tarea no forma parte de la lista de tareas pendientes\n");
+    }
 }
