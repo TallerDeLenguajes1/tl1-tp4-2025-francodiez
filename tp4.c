@@ -31,111 +31,107 @@ int main(){
     Tarea tar;
     char clave[100];
     tar.Descripcion=(char *)malloc(100 * sizeof(char));
-    int opciones, idauto=999, finaliza=0,opciones2;
+    int opciones=0, idauto=999, finaliza=0,opciones2=0;
     TareasPendientes=crearLista();
     TareasRealizadas=crearLista();
 
-    printf("Carga de tareas:\n");
-    do{
-        idauto++;
-        printf("Ingrese Descripcion de la tarea:\n");
-        gets(tar.Descripcion);
+    while(opciones!=6){
+        printf("\nSeleccione una opcion:\n1-Cargar tareas\n2-Mover tarea\n3-Listar Tareas\n4-Buscar tarea por ID\n5-Buscar tarea por Clave\n6-Salir\n");
+        scanf("%d",&opciones);
         fflush(stdin);
-        do {
-            printf("Ingrese duracion de la tarea entre 10 y 100:\n");
-            scanf("%d",&tar.Duracion);
-            fflush(stdin);
-        } while(tar.Duracion<10 || tar.Duracion>100);
-        tar.TareaID=idauto;
-        nuevo=CrearNodo(tar);
-        InsertarNodo(&TareasPendientes,nuevo);
-        printf("Ingrese 1 para finalizar la carga de tareas, cualquier otro numero si quiere continuar\n");
-        scanf("%d",&finaliza);
-        fflush(stdin);
-    } while(finaliza!=1);
-    finaliza=0;
-
-    //para el checkeo de tareas, tengo que buscar el nodo, quitarlo y luego insertarlo en la otra lista
-    printf("Checkeo de tareas:\n");
-    do{
-        printf("Ingrese el id de la tarea para marcarla como completada:\n");
-        scanf("%d",&tar.TareaID);
-        fflush(stdin);
-        TrasladoTarea(&TareasPendientes, &TareasRealizadas,tar.TareaID);
-        printf("Ingrese 1 si quiere parar de marcar tareas como completadas, cualquier otro numero para continuar\n");
-        scanf("%d",&finaliza);
-        fflush(stdin);
-    } while(finaliza!=1);
-    finaliza=0;
-
-    /*while(finaliza!=1){
-        printf("\n1-Mostrar ambas lista \n2-Mostrar lista de tareas pendientes \n3-Mostrar lista de tareas realizadas\n4-Finalizar\n");
-        scanf("%d",&opciones2);
-        switch (opciones2){
-        case 1:
-            printf("Lista de tareas pendientes:");
-            mostrar(TareasPendientes);
-            printf("\n\nLista de tareas realizadas:");
-            mostrar(TareasRealizadas);
-            break;
-        case 2:
-            printf("Lista de tareas pendientes:");
-            mostrar(TareasPendientes);
-            break;  
-        case 3:
-            printf("Lista de tareas realizadas:");
-            mostrar(TareasRealizadas);
-            break;      
-        
-        default:
-            finaliza=1;
-            break;
+        switch(opciones){
+            case 1:
+                printf("Carga de tareas:\n");
+                do{
+                    idauto++;
+                    printf("Ingrese Descripcion de la tarea:\n");
+                    gets(tar.Descripcion);
+                    fflush(stdin);
+                    do {
+                        printf("Ingrese duracion de la tarea entre 10 y 100:\n");
+                        scanf("%d",&tar.Duracion);
+                        fflush(stdin);
+                    } while(tar.Duracion<10 || tar.Duracion>100);
+                    tar.TareaID=idauto;
+                    nuevo=CrearNodo(tar);
+                    InsertarNodo(&TareasPendientes,nuevo);
+                    printf("Ingrese 1 para finalizar la carga de tareas, cualquier otro numero si quiere continuar\n");
+                    scanf("%d",&finaliza);
+                    fflush(stdin);
+                } while(finaliza!=1);
+                finaliza=0;
+                break;
+            case 2:
+                printf("Mover tarea\n");
+                printf("Ingrese el id de la tarea para marcarla como completada:\n");
+                scanf("%d",&tar.TareaID);
+                fflush(stdin);
+                TrasladoTarea(&TareasPendientes, &TareasRealizadas,tar.TareaID);
+                break;    
+            case 3:
+                while(opciones2!=4){
+                    printf("\n1-Mostrar ambas lista \n2-Mostrar lista de tareas pendientes \n3-Mostrar lista de tareas realizadas\n4-Finalizar\n");
+                    scanf("%d",&opciones2);
+                    switch (opciones2){
+                        case 1:
+                            printf("Lista de tareas pendientes:");
+                            mostrar(TareasPendientes);
+                            printf("\n\nLista de tareas realizadas:");
+                            mostrar(TareasRealizadas);
+                            break;
+                        case 2:
+                            printf("Lista de tareas pendientes:");
+                            mostrar(TareasPendientes);
+                            break;  
+                        case 3:
+                        printf("Lista de tareas realizadas:");
+                        mostrar(TareasRealizadas);
+                            break;      
+                    }
+                }
+                opciones2=0;
+                break;
+            case 4:  
+                printf("Ingrese la ID de la tarea que busca\n");
+                scanf("%d",&tar.TareaID);
+                fflush(stdin);
+                if (buscarNodoPorID(TareasPendientes,tar.TareaID) != NULL){
+                    Nodo* encontrado=buscarNodoPorID(TareasPendientes,tar.TareaID);
+                    printf("Es una tarea pendiente:");
+                    printf("\nTarea ID: %d",encontrado->T.TareaID);
+                    printf("\nDescripcion: %s",encontrado->T.Descripcion);
+                    printf("\nDuracion: %d",encontrado->T.Duracion);
+                } else if(buscarNodoPorID(TareasRealizadas,tar.TareaID) != NULL){
+                    Nodo* encontrado=buscarNodoPorID(TareasRealizadas,tar.TareaID);
+                    printf("Es una tarea realizada:");
+                    printf("\nTarea ID: %d",encontrado->T.TareaID);
+                    printf("\nDescripcion: %s",encontrado->T.Descripcion);
+                    printf("\nDuracion: %d",encontrado->T.Duracion);
+                } else {
+                    printf("La tarea no se encuentra en ninguna de las dos listas");
+                }
+                break;
+            case 5:    
+                printf("Ingrese una palabra clave de la descripcion de la tarea que busca\n");
+                scanf("%s",&clave);
+                fflush(stdin);
+                if (buscarNodoPorClave(TareasPendientes,clave) != NULL){
+                    Nodo* encontrado=buscarNodoPorClave(TareasPendientes,clave);
+                    printf("Es una tarea pendiente:");
+                    printf("\nTarea ID: %d",encontrado->T.TareaID);
+                    printf("\nDescripcion: %s",encontrado->T.Descripcion);
+                    printf("\nDuracion: %d",encontrado->T.Duracion);
+                } else if(buscarNodoPorClave(TareasRealizadas,clave) != NULL){
+                    Nodo* encontrado=buscarNodoPorClave(TareasRealizadas,clave);
+                    printf("Es una tarea realizada:");
+                    printf("\nTarea ID: %d",encontrado->T.TareaID);
+                    printf("\nDescripcion: %s",encontrado->T.Descripcion);
+                    printf("\nDuracion: %d",encontrado->T.Duracion);
+                } else {
+                    printf("La tarea no se encuentra en ninguna de las dos listas");
+                }
+                break;
         }
-    } */
-
-    printf("\n1-Consultar tarea por id \n2-Consultar tarea por palabra clave\n");
-    scanf("%d",&opciones2);
-    switch(opciones2){
-        case 1:
-            printf("Ingrese la ID de la tarea que busca\n");
-            scanf("%d",&tar.TareaID);
-            fflush(stdin);
-            if (buscarNodoPorID(TareasPendientes,tar.TareaID) != NULL){
-                Nodo* encontrado=buscarNodoPorID(TareasPendientes,tar.TareaID);
-                printf("Es una tarea pendiente:");
-                printf("\nTarea ID: %d",encontrado->T.TareaID);
-                printf("\nDescripcion: %s",encontrado->T.Descripcion);
-                printf("\nDuracion: %d",encontrado->T.Duracion);
-            } else if(buscarNodoPorID(TareasRealizadas,tar.TareaID) != NULL){
-                Nodo* encontrado=buscarNodoPorID(TareasRealizadas,tar.TareaID);
-                printf("Es una tarea realizada:");
-                printf("\nTarea ID: %d",encontrado->T.TareaID);
-                printf("\nDescripcion: %s",encontrado->T.Descripcion);
-                printf("\nDuracion: %d",encontrado->T.Duracion);
-            } else {
-                printf("La tarea no se encuentra en ninguna de las dos listas");
-            }
-            break;
-        case 2:
-            printf("Ingrese una palabra clave de la descripcion de la tarea que busca\n");
-            scanf("%s",&clave);
-            fflush(stdin);
-            if (buscarNodoPorClave(TareasPendientes,clave) != NULL){
-                Nodo* encontrado=buscarNodoPorClave(TareasPendientes,clave);
-                printf("Es una tarea pendiente:");
-                printf("\nTarea ID: %d",encontrado->T.TareaID);
-                printf("\nDescripcion: %s",encontrado->T.Descripcion);
-                printf("\nDuracion: %d",encontrado->T.Duracion);
-            } else if(buscarNodoPorClave(TareasRealizadas,clave) != NULL){
-                Nodo* encontrado=buscarNodoPorClave(TareasRealizadas,clave);
-                printf("Es una tarea realizada:");
-                printf("\nTarea ID: %d",encontrado->T.TareaID);
-                printf("\nDescripcion: %s",encontrado->T.Descripcion);
-                printf("\nDuracion: %d",encontrado->T.Duracion);
-            } else {
-                printf("La tarea no se encuentra en ninguna de las dos listas");
-            }
-            break;    
     }
 
     while(TareasPendientes!=NULL){
@@ -145,7 +141,6 @@ int main(){
         TareasRealizadas=borrarPrimerElemento(TareasRealizadas);
     }
     free(tar.Descripcion);
-    printf("\nprobando final");
 
     getchar();
     return 0;
