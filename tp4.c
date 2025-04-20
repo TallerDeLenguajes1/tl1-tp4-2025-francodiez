@@ -21,6 +21,7 @@ Nodo* borrarPrimerElemento(Nodo* L); //esta la usare para al final borrar la mem
 Nodo* buscarNodoPorID(Nodo* L, int IdBuscado);
 void TrasladoTarea(Nodo** L1, Nodo** L2,int ID);
 void mostrar(Nodo*L);
+Nodo* buscarNodoPorClave(Nodo* L,char clave[]);
 //////////////////////////////////////////
 int main(){
     Nodo* TareasPendientes;
@@ -28,6 +29,7 @@ int main(){
     Nodo* nuevo;
     Nodo* encontrado;
     Tarea tar;
+    char clave[100];
     tar.Descripcion=(char *)malloc(100 * sizeof(char));
     int opciones, idauto=999, finaliza=0,opciones2;
     TareasPendientes=crearLista();
@@ -66,7 +68,7 @@ int main(){
     } while(finaliza!=1);
     finaliza=0;
 
-    while(finaliza!=1){
+    /*while(finaliza!=1){
         printf("\n1-Mostrar ambas lista \n2-Mostrar lista de tareas pendientes \n3-Mostrar lista de tareas realizadas\n4-Finalizar\n");
         scanf("%d",&opciones2);
         switch (opciones2){
@@ -89,6 +91,51 @@ int main(){
             finaliza=1;
             break;
         }
+    } */
+
+    printf("\n1-Consultar tarea por id \n2-Consultar tarea por palabra clave\n");
+    scanf("%d",&opciones2);
+    switch(opciones2){
+        case 1:
+            printf("Ingrese la ID de la tarea que busca\n");
+            scanf("%d",&tar.TareaID);
+            fflush(stdin);
+            if (buscarNodoPorID(TareasPendientes,tar.TareaID) != NULL){
+                Nodo* encontrado=buscarNodoPorID(TareasPendientes,tar.TareaID);
+                printf("Es una tarea pendiente:");
+                printf("\nTarea ID: %d",encontrado->T.TareaID);
+                printf("\nDescripcion: %s",encontrado->T.Descripcion);
+                printf("\nDuracion: %d",encontrado->T.Duracion);
+            } else if(buscarNodoPorID(TareasRealizadas,tar.TareaID) != NULL){
+                Nodo* encontrado=buscarNodoPorID(TareasRealizadas,tar.TareaID);
+                printf("Es una tarea realizada:");
+                printf("\nTarea ID: %d",encontrado->T.TareaID);
+                printf("\nDescripcion: %s",encontrado->T.Descripcion);
+                printf("\nDuracion: %d",encontrado->T.Duracion);
+            } else {
+                printf("La tarea no se encuentra en ninguna de las dos listas");
+            }
+            break;
+        case 2:
+            printf("Ingrese una palabra clave de la descripcion de la tarea que busca\n");
+            scanf("%s",&clave);
+            fflush(stdin);
+            if (buscarNodoPorClave(TareasPendientes,clave) != NULL){
+                Nodo* encontrado=buscarNodoPorClave(TareasPendientes,clave);
+                printf("Es una tarea pendiente:");
+                printf("\nTarea ID: %d",encontrado->T.TareaID);
+                printf("\nDescripcion: %s",encontrado->T.Descripcion);
+                printf("\nDuracion: %d",encontrado->T.Duracion);
+            } else if(buscarNodoPorClave(TareasRealizadas,clave) != NULL){
+                Nodo* encontrado=buscarNodoPorClave(TareasRealizadas,clave);
+                printf("Es una tarea realizada:");
+                printf("\nTarea ID: %d",encontrado->T.TareaID);
+                printf("\nDescripcion: %s",encontrado->T.Descripcion);
+                printf("\nDuracion: %d",encontrado->T.Duracion);
+            } else {
+                printf("La tarea no se encuentra en ninguna de las dos listas");
+            }
+            break;    
     }
 
     while(TareasPendientes!=NULL){
@@ -172,4 +219,12 @@ void mostrar(Nodo*L){
         printf("\nDuracion: %d",L->T.Duracion);
         L=L->Siguiente;
     }
+}
+
+Nodo* buscarNodoPorClave(Nodo* L,char clave[]){
+    Nodo* Aux = L;
+    while((Aux!=NULL) && strstr(Aux->T.Descripcion,clave)==NULL){
+        Aux = Aux->Siguiente;
+    }
+    return Aux; //si no lo encuentra me da nulo
 }
